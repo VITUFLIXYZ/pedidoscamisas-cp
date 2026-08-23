@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- CONTROLE ANTI-CACHE -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>👕 Venda de Camisas - Festejo de Santa Rita de Cássia</title>
+
+    <!-- BIBLIOTECA LOCAL PARA QR CODE -->
+    <script src="qrcode.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f4f6f9; color: #333; padding: 12px; }
+
+        /* TELA DE LOGIN UNIFICADA */
+        .modal-login-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 15px; }
+        .box-login { background: white; padding: 25px; border-radius: 16px; width: 100%; max-width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; }
+        .box-login h2 { font-size: 20px; color: #27ae60; margin-bottom: 5px; }
+        .box-login p { font-size: 13px; color: #666; margin-bottom: 20px; }
+        .grupo-input { margin-bottom: 15px; text-align: left; }
+        .grupo-input label { display: block; font-size: 12px; font-weight: bold; color: #444; margin-bottom: 5px; }
+        .grupo-input input { width: 100%; padding: 12px; font-size: 15px; border: 1px solid #ccc; border-radius: 8px; outline: none; }
+        .grupo-input input:focus { border-color: #27ae60; }
+        .btn-entrar { width: 100%; background: #27ae60; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        /* CABEÇALHO E ESTRUTURA */
+        .header { text-align: center; margin-bottom: 12px; }
+        .header h1 { font-size: 20px; color: #2c3e50; }
+        .header .sub { font-size: 13px; color: #666; }
+        .info-caixa { font-size: 12px; font-weight: bold; background: #e8f8f5; color: #1e8449; display: inline-block; padding: 4px 10px; border-radius: 12px; margin-top: 5px; }
+
+        .btn-sync { background: #2980b9; color: white; border: none; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.15); margin: 8px auto; display: block; }
+
+        /* GRADE COMPATÍVEL COM SAFARI IPAD MINI */
+        .grid-produtos { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+        .btn-produto { flex: 1 1 calc(50% - 10px); min-width: 130px; border: none; border-radius: 10px; color: white; font-weight: bold; padding: 14px 10px; text-align: center; font-size: 14px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.15); display: flex; flex-direction: column; justify-content: space-between; min-height: 95px; }
+        .btn-produto:active { transform: scale(0.96); }
+        .btn-produto .nome { font-size: 14px; line-height: 1.2; margin-bottom: 6px; }
+        .btn-produto .preco { font-size: 15px; background: rgba(0,0,0,0.25); padding: 4px 8px; border-radius: 6px; display: inline-block; }
+        .btn-produto .sub-info { font-size: 10px; font-weight: normal; margin-top: 4px; opacity: 0.9; }
+
+        /* PAINEL DE VENDA */
+        .painel-venda { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        .painel-venda h3 { font-size: 16px; margin-bottom: 8px; border-bottom: 2px solid #eee; padding-bottom: 4px; }
+        
+        .lista-carrinho { list-style: none; max-height: 200px; overflow-y: auto; margin-bottom: 10px; }
+        .item-carrinho { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 14px; }
+        .qtd-controles { display: flex; align-items: center; gap: 6px; }
+        .btn-qtd { width: 28px; height: 28px; border: none; background: #eee; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 16px; }
+
+        .total-container { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin: 10px 0; color: #27ae60; }
+
+        .secao-opcao-titulo { font-size: 11px; text-transform: uppercase; color: #2c3e50; font-weight: bold; margin-bottom: 4px; display: block; }
+        
+        .metodos-pagamento { display: flex; gap: 8px; margin-bottom: 12px; }
+        .btn-pagamento { flex: 1; padding: 10px 4px; border: 2px solid #ddd; background: white; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: center; }
+        .btn-pagamento.ativo { border-color: #27ae60; background: #e8f8f5; color: #27ae60; }
+
+        /* OPÇÃO DE STATUS NO MOMENTO DA COMPRA */
+        .status-pagamento-box { display: flex; gap: 8px; margin-bottom: 12px; }
+        .btn-status-venda { flex: 1; padding: 8px 4px; border: 2px solid #ddd; background: #f8f9fa; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; color: #555; }
+        .btn-status-venda.ativo-pago { border-color: #27ae60; background: #e8f8f5; color: #27ae60; }
+        .btn-status-venda.ativo-pendente { border-color: #e67e22; background: #fef5e7; color: #d35400; }
+
+        /* DADOS CLIENTE */
+        .box-cliente { background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
+        .box-cliente label { font-size: 11px; text-transform: uppercase; color: #2c3e50; font-weight: bold; display: block; margin-bottom: 4px; }
+        .box-cliente input[type="text"], .box-cliente input[type="tel"] { width: 100%; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; outline: none; }
+        
+        /* ESTILO DO CHECKBOX SEM WHATSAPP */
+        .label-sem-whats {
+            font-size: 11px !important;
+            font-weight: bold;
+            color: #7f8c8d;
+            display: flex !important;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            text-transform: none !important;
+        }
+        .label-sem-whats input[type="checkbox"] { width: auto !important; cursor: pointer; }
+        input:disabled { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border-color: #ced4da; }
+
+        /* TROCO */
+        .painel-troco { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+        .campo-recebido { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 14px; font-weight: bold; }
+        .input-recebido { width: 110px; padding: 6px 8px; font-size: 15px; text-align: right; border: 1px solid #ced4da; border-radius: 6px; font-weight: bold; color: #2c3e50; }
+        .atalhos-cedulas { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+        .btn-cedula { flex: 1; min-width: 45px; background: #e9ecef; border: 1px solid #ced4da; padding: 8px 2px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; text-align: center; color: #495057; }
+        .linha-troco { display: flex; justify-content: space-between; font-size: 15px; font-weight: bold; color: #2c3e50; padding-top: 4px; border-top: 1px dashed #ccc; }
+
+        .acoes-venda { display: flex; gap: 8px; }
+        .btn-finalizar { flex: 2; background: #27ae60; color: white; border: none; padding: 14px 6px; font-size: 15px; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        .btn-finalizar:disabled { background: #ccc; }
+        .btn-cancelar-pedido { flex: 1; background: #e74c3c; color: white; border: none; padding: 14px 6px; font-size: 13px; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        .btn-cancelar-pedido:disabled { background: #f5b7b1; cursor: not-allowed; }
+
+        /* HISTÓRICO E GERENCIADOR */
+        .secao-historico, .secao-gerenciador { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        .titulo-secao { font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+
+        .tabela-historico { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .tabela-historico th, .tabela-historico td { border-bottom: 1px solid #eee; padding: 6px; text-align: left; vertical-align: middle; }
+
+        .btn-acao { width: 100%; background: #2c3e50; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+
+        /* BOTÕES DE AÇÃO AMPLIADOS NA TABELA DE HISTÓRICO */
+        .acoes-tabela { display: flex; align-items: center; gap: 8px; }
+        .btn-acao-tabela {
+            background: #f0f2f5;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .btn-acao-tabela:active { background: #e2e8f0; transform: scale(0.92); }
+        .btn-acao-tabela.btn-del { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+
+        /* MODAL SELEÇÃO DE TAMANHO */
+        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1500; padding: 15px; }
+        .box-modal { background: white; padding: 20px; border-radius: 14px; width: 100%; max-width: 340px; text-align: center; }
+        .box-modal h3 { font-size: 18px; color: #2c3e50; margin-bottom: 4px; }
+        .box-modal p { font-size: 13px; color: #666; margin-bottom: 15px; }
+        .grid-tamanhos { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; max-height: 250px; overflow-y: auto; padding: 4px; }
+        .btn-tamanho { background: #34495e; color: white; border: none; padding: 10px 12px; font-size: 13px; font-weight: bold; border-radius: 8px; cursor: pointer; min-width: 70px; display: flex; flex-direction: column; align-items: center; }
+        .btn-tamanho span.vlr { font-size: 10px; font-weight: normal; opacity: 0.85; margin-top: 2px; }
+        .btn-tamanho:active { background: #27ae60; }
+        .btn-fechar-modal { width: 100%; background: #7f8c8d; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* MODAL PIX */
+        .modal-pix { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-conteudo { background: white; padding: 20px; border-radius: 12px; text-align: center; max-width: 90%; width: 330px; }
+        #qrcode { margin: 15px auto; display: flex; justify-content: center; min-height: 170px; }
+        .btn-voltar-pix { width: 100%; background: #7f8c8d; color: white; border: none; padding: 10px; font-size: 14px; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+    <!-- MODAL DE LOGIN UNIFICADO -->
+    <div id="modal-login" class="modal-login-overlay" style="display: none;">
+        <div class="box-login">
+            <h2>👕 Venda de Camisas</h2>
+            <p>Festejo de Santa Rita de Cássia</p>
+            <div class="grupo-input">
+                <label>Nome do Caixa / Operador:</label>
+                <input type="text" id="login-usuario" placeholder="Ex: Caixa Camisas 1, Maria">
+            </div>
+            <div class="grupo-input">
+                <label>Senha do Dia:</label>
+                <input type="password" id="login-senha" placeholder="Digite a senha">
+            </div>
+            <button class="btn-entrar" onclick="autenticarEEntrar()">ABRIR CAIXA DE CAMISAS</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE SELEÇÃO DE TAMANHO -->
+    <div id="modal-tamanho" class="modal-overlay">
+        <div class="box-modal">
+            <h3 id="modal-nome-produto">Selecione o Tamanho</h3>
+            <p>Selecione a opção para adicionar ao carrinho:</p>
+            <div id="container-tamanhos" class="grid-tamanhos"></div>
+            <button class="btn-fechar-modal" onclick="fecharModalTamanho()">Cancelar</button>
+        </div>
+    </div>
+
+    <div class="header">
+        <h1>👕 Camisas - Santa Rita de Cássia</h1>
+        <div class="sub">Gestão de Vendas & Encomendas</div>
+        <div id="display-caixa" class="info-caixa">Carregando Caixa...</div>
+    </div>
+
+    <button type="button" class="btn-sync" onclick="forcarSincronizacaoCardapio()">🔄 Sincronizar Tabela</button>
+
+    <div id="grid-produtos" class="grid-produtos"></div>
+
+    <div class="painel-venda">
+        <h3>🛒 Pedido Atual</h3>
+        <ul id="lista-carrinho" class="lista-carrinho">
+            <li style="color: #888; font-size: 12px; text-align: center; padding: 10px;">Nenhum item selecionado</li>
+        </ul>
+
+        <div class="total-container">
+            <span>TOTAL:</span>
+            <span id="valor-total">R$ 0,00</span>
+        </div>
+
+        <!-- DADOS OBRIGATÓRIOS DO CLIENTE -->
+        <div class="box-cliente">
+            <div style="margin-bottom: 8px;">
+                <label>👤 Nome do Cliente *</label>
+                <input type="text" id="cliente-nome" placeholder="Ex: Maria da Silva" autocomplete="off">
+            </div>
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label style="margin-bottom: 0;">📱 WhatsApp do Cliente *</label>
+                    <label class="label-sem-whats">
+                        <input type="checkbox" id="chk-sem-whats" onchange="alternarCampoTelefone(this)"> Sem WhatsApp / Pago na Hora
+                    </label>
+                </div>
+                <input type="tel" id="cliente-telefone" placeholder="(99) 90000-0000" maxlength="15" oninput="aplicarMascaraTelefone(this)" autocomplete="off">
+            </div>
+        </div>
+
+        <span class="secao-opcao-titulo">Forma de Pagamento:</span>
+        <div class="metodos-pagamento">
+            <button class="btn-pagamento ativo" id="btn-metodo-dinheiro" onclick="selecionarMetodo('Dinheiro', this)">💵 Dinheiro</button>
+            <button class="btn-pagamento" id="btn-metodo-pix" onclick="selecionarMetodo('Pix', this)">📱 Pix</button>
+        </div>
+
+        <span class="secao-opcao-titulo">Situação do Pagamento:</span>
+        <div class="status-pagamento-box">
+            <button id="btn-status-pago" class="btn-status-venda ativo-pago" onclick="selecionarStatusInicial('Pago')">✅ Pago na Hora</button>
+            <button id="btn-status-pendente" class="btn-status-venda" onclick="selecionarStatusInicial('Pendente')">⏳ Vai Pagar Depois</button>
+        </div>
+
+        <div id="painel-troco" class="painel-troco">
+            <div class="campo-recebido">
+                <span>Valor Recebido:</span>
+                <input type="number" id="input-recebido" class="input-recebido" step="0.01" min="0" placeholder="0,00" oninput="calcularTroco()">
+            </div>
+            <div class="atalhos-cedulas">
+                <button class="btn-cedula" onclick="aplicarCedula('exato')">Exato</button>
+                <button class="btn-cedula" onclick="aplicarCedula(20)">R$ 20</button>
+                <button class="btn-cedula" onclick="aplicarCedula(30)">R$ 30</button>
+                <button class="btn-cedula" onclick="aplicarCedula(50)">R$ 50</button>
+                <button class="btn-cedula" onclick="aplicarCedula(100)">R$ 100</button>
+            </div>
+            <div class="linha-troco">
+                <span>TROCO:</span>
+                <span id="valor-troco">R$ 0,00</span>
+            </div>
+        </div>
+
+        <div class="acoes-venda">
+            <button id="btn-cancelar-pedido" class="btn-cancelar-pedido" onclick="cancelarPedidoAtual()" disabled>❌ CANCELAR</button>
+            <button id="btn-finalizar" class="btn-finalizar" onclick="concluirVenda()" disabled>CONFIRMAR VENDA</button>
+        </div>
+    </div>
+
+    <div class="secao-historico">
+        <div class="titulo-secao" onclick="alternarVisibilidade('conteudo-historico')">
+            <span>📋 Vendas Recentes</span>
+            <span id="resumo-faturamento">Total: R$ 0,00</span>
+        </div>
+        <div id="conteudo-historico" style="display: block;">
+            <table class="tabela-historico">
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Cliente</th>
+                        <th>Camisas</th>
+                        <th>Pgto</th>
+                        <th>Total</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="corpo-historico"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- GERENCIADOR -->
+    <div class="secao-gerenciador">
+        <div class="titulo-secao" onclick="alternarVisibilidade('painel-gerenciador')">
+            <span>⚙️ Painel do Gerenciador</span>
+            <span>📂</span>
+        </div>
+        <div id="painel-gerenciador" style="display: none; margin-top: 10px;">
+            <button class="btn-acao" onclick="alterarNomeCaixa()">🏷️ Renomear este Caixa</button>
+            <button class="btn-acao" style="background: #27ae60;" onclick="gerarRelatorioPDF()">📄 Baixar / Imprimir Relatório PDF</button>
+            <button class="btn-acao" style="background: #c0392b;" onclick="limparHistoricoDia()">🗑️ Zerar Vendas do Dia</button>
+        </div>
+    </div>
+
+    <!-- MODAL PIX COM EXIBIÇÃO DE QR CODE -->
+    <div id="modal-pix" class="modal-pix">
+        <div class="modal-conteudo">
+            <h3>Pagamento via Pix</h3>
+            <p style="font-size: 13px; margin-top: 5px;">Apresente o QR Code ao cliente:</p>
+            <div id="qrcode"></div>
+            <div style="font-weight: bold; font-size: 18px; margin-bottom: 12px;" id="pix-valor-display"></div>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button class="btn-finalizar" style="background: #25D366; width: 100%; font-size: 13px;" onclick="confirmarPixEAbrirWhats()">📲 Confirmar + Enviar WhatsApp</button>
+                <button class="btn-finalizar" style="width: 100%; font-size: 13px;" onclick="confirmarPagamentoPixDireto()">✅ Concluir Registro</button>
+                <button class="btn-voltar-pix" onclick="fecharModalPix()">↩️ Voltar / Alterar Pedido</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- CONFIGURAÇÕES DO SISTEMA --- */
+        var TELEGRAM_BOT_TOKEN = "token";
+        var TELEGRAM_CHAT_ID   = "158853709";
+
+        var GITHUB_TOKEN       = "github_pat_"; 
+        var GITHUB_USER        = "VITUFLIXYZ";
+        var GITHUB_REPO        = "pedidoscamisas";
+
+        /* CONFIGURAÇÕES DO PIX (SEM ACENTOS PARA GARANTIR LEITURA BANCÁRIA) */
+        var CHAVE_PIX        = "+5598991589389"; 
+        var NOME_RECEBEDOR   = "PAROQUIA SANTA RITA";
+        var CIDADE_RECEBEDOR = "SANTA RITA";
+
+        var CARDAPIO_PADRAO = [
+            {
+                id: "1",
+                nome: "Camisa Padronizada",
+                sub: "Infantil / Adulto / XGG",
+                cor: "#2980b9",
+                opcoes: [
+                    { tamanho: "Infantil 2", preco: 20.00, encomenda: false },
+                    { tamanho: "Infantil 4", preco: 20.00, encomenda: false },
+                    { tamanho: "Infantil 6", preco: 20.00, encomenda: false },
+                    { tamanho: "Infantil 8", preco: 20.00, encomenda: false },
+                    { tamanho: "Infantil 10", preco: 20.00, encomenda: false },
+                    { tamanho: "Infantil 12", preco: 25.00, encomenda: false },
+                    { tamanho: "PP", preco: 25.00, encomenda: false },
+                    { tamanho: "P", preco: 30.00, encomenda: false },
+                    { tamanho: "M", preco: 30.00, encomenda: false },
+                    { tamanho: "G", preco: 30.00, encomenda: false },
+                    { tamanho: "GG", preco: 30.00, encomenda: false },
+                    { tamanho: "XG", preco: 35.00, encomenda: true },
+                    { tamanho: "XGG", preco: 35.00, encomenda: true }
+                ]
+            },
+            {
+                id: "2",
+                nome: "Camisa Gola Polo",
+                sub: "Sob Encomenda (Vários Tamanhos)",
+                cor: "#8e44ad",
+                opcoes: [
+                    { tamanho: "Gola Polo (P)", preco: 45.00, encomenda: true },
+                    { tamanho: "Gola Polo (M)", preco: 45.00, encomenda: true },
+                    { tamanho: "Gola Polo (G)", preco: 45.00, encomenda: true },
+                    { tamanho: "Gola Polo (GG)", preco: 45.00, encomenda: true },
+                    { tamanho: "Gola Polo (XG)", preco: 45.00, encomenda: true },
+                    { tamanho: "Gola Polo (Outro)", preco: 45.00, encomenda: true }
+                ]
+            }
+        ];
+
+        var NOME_CAIXA = localStorage.getItem('nome_caixa_camisas') || "";
+        var DATA_ACESSO_LOCAL = localStorage.getItem('data_acesso_camisas') || "";
+        var produtos = CARDAPIO_PADRAO;
+        var carrinho = [];
+        var historicoVendas = [];
+        var metodoSelecionado = "Dinheiro";
+        var statusSelecionado = "Pago";
+        var senhaAcessoServidor = "1234";
+
+        function padLeft(str, length, padChar) {
+            padChar = padChar || '0';
+            str = str.toString();
+            while (str.length < length) { str = padChar + str; }
+            return str;
+        }
+
+        function calcularCRC16(str) {
+            var crc = 0xFFFF;
+            for (var i = 0; i < str.length; i++) {
+                crc ^= (str.charCodeAt(i) << 8);
+                for (var j = 0; j < 8; j++) {
+                    if ((crc & 0x8000) !== 0) {
+                        crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+                    } else {
+                        crc = (crc << 1) & 0xFFFF;
+                    }
+                }
+            }
+            return padLeft(crc.toString(16).toUpperCase(), 4, '0');
+        }
+
+        function gerarPayloadPixOficial(chave, nome, cidade, valor) {
+            function formatField(id, val) {
+                var len = padLeft(val.length.toString(), 2, '0');
+                return id + len + val;
+            }
+
+            var nomeLimpo = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+            var cidadeLimpa = cidade.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+
+            var merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
+            var payloadSemCRC = '000201' +
+                formatField('26', merchantAccount) +
+                '52040000' +
+                '5303986' +
+                formatField('54', valor.toFixed(2)) +
+                '5802BR' +
+                formatField('59', nomeLimpo.substring(0, 25)) +
+                formatField('60', cidadeLimpa.substring(0, 15)) +
+                '62070503***' +
+                '6304';
+
+            return payloadSemCRC + calcularCRC16(payloadSemCRC);
+        }
+
+        /* --- GERENCIAMENTO DO MODAL PIX --- */
+        function abrirModalPix(total) {
+            document.getElementById('pix-valor-display').innerText = 'R$ ' + total.toFixed(2).replace('.', ',');
+            var qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            
+            document.getElementById('modal-pix').style.display = 'flex';
+
+            var payloadPix = gerarPayloadPixOficial(CHAVE_PIX, NOME_RECEBEDOR, CIDADE_RECEBEDOR, total);
+
+            setTimeout(function() {
+                var renderizadoSucesso = false;
+
+                try {
+                    if (typeof QRCode !== 'undefined') {
+                        new QRCode(qrContainer, {
+                            text: payloadPix,
+                            width: 170,
+                            height: 170,
+                            colorDark: "#000000",
+                            colorLight: "#ffffff",
+                            correctLevel: QRCode.CorrectLevel.M
+                        });
+                        
+                        if (qrContainer.children.length > 0) {
+                            renderizadoSucesso = true;
+                        }
+                    }
+                } catch(e) {
+                    renderizadoSucesso = false;
+                }
+
+                if (!renderizadoSucesso) {
+                    qrContainer.innerHTML = '';
+                    var urlQrApi = "https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=" + encodeURIComponent(payloadPix);
+                    qrContainer.innerHTML = '<img src="' + urlQrApi + '" width="170" height="170" alt="QR Code Pix" style="display:block; margin:0 auto; border-radius:8px;">';
+                }
+            }, 100);
+        }
+
+        function fecharModalPix() {
+            document.getElementById('modal-pix').style.display = 'none';
+        }
+
+        function confirmarPixEAbrirWhats() {
+            fecharModalPix();
+            processarFechamentoVenda(statusSelecionado, true);
+        }
+
+        function confirmarPagamentoPixDireto() {
+            fecharModalPix();
+            processarFechamentoVenda(statusSelecionado, false);
+        }
+
+        function ajaxGet(url, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url + '?v=' + new Date().getTime(), true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) { callback(xhr.status === 200 ? xhr.responseText : null); }
+            };
+            xhr.onerror = function() { callback(null); };
+            xhr.send();
+        }
+
+        function aplicarMascaraTelefone(input) {
+            var v = input.value.replace(/\D/g, '');
+            if (v.length > 11) v = v.slice(0, 11);
+
+            if (v.length === 0) { input.value = ''; }
+            else if (v.length <= 2) { input.value = '(' + v; }
+            else if (v.length <= 7) { input.value = '(' + v.slice(0, 2) + ') ' + v.slice(2); }
+            else if (v.length <= 10) { input.value = '(' + v.slice(0, 2) + ') ' + v.slice(2, 6) + '-' + v.slice(6); }
+            else { input.value = '(' + v.slice(0, 2) + ') ' + v.slice(2, 7) + '-' + v.slice(7); }
+        }
+
+        function alternarCampoTelefone(checkbox) {
+            var inputTelefone = document.getElementById('cliente-telefone');
+            if (checkbox.checked) {
+                inputTelefone.value = '';
+                inputTelefone.disabled = true;
+                inputTelefone.placeholder = "Não informado (Pago na Hora)";
+            } else {
+                inputTelefone.disabled = false;
+                inputTelefone.placeholder = "(99) 90000-0000";
+            }
+        }
+
+        window.onload = function() {
+            carregarSenhaDoServidor(function(senha) {
+                if (senha) senhaAcessoServidor = senha;
+                verificarAutenticacaoInicial();
+            });
+        };
+
+        function verificarAutenticacaoInicial() {
+            var dataHoje = new Date().toISOString().split('T')[0];
+            if (!NOME_CAIXA || DATA_ACESSO_LOCAL !== dataHoje) {
+                document.getElementById('modal-login').style.display = 'flex';
+                if (NOME_CAIXA) document.getElementById('login-usuario').value = NOME_CAIXA;
+            } else {
+                iniciarAplicacao();
+            }
+        }
+
+        function autenticarEEntrar() {
+            var usuario = document.getElementById('login-usuario').value.trim();
+            var senha = document.getElementById('login-senha').value.trim();
+            var dataHoje = new Date().toISOString().split('T')[0];
+
+            if (!usuario) { alert("Por favor, digite o nome do Caixa."); return; }
+            if (senha !== senhaAcessoServidor) { alert("❌ Senha incorreta!"); return; }
+
+            NOME_CAIXA = usuario.replace(/[^a-zA-Z0-9_-]/g, "_");
+            DATA_ACESSO_LOCAL = dataHoje;
+
+            localStorage.setItem('nome_caixa_camisas', NOME_CAIXA);
+            localStorage.setItem('data_acesso_camisas', DATA_ACESSO_LOCAL);
+
+            document.getElementById('modal-login').style.display = 'none';
+            iniciarAplicacao();
+        }
+
+        function iniciarAplicacao() {
+            document.getElementById('display-caixa').innerText = "📍 Operador: " + NOME_CAIXA.replace(/_/g, " ");
+            historicoVendas = JSON.parse(localStorage.getItem('historico_camisas_' + NOME_CAIXA)) || [];
+            renderizarBotoesVenda();
+            renderizarHistorico();
+        }
+
+        function carregarSenhaDoServidor(callback) {
+            ajaxGet('senha.txt', function(res) { callback(res ? res.trim() : null); });
+        }
+
+        function forcarSincronizacaoCardapio() {
+            renderizarBotoesVenda();
+            alert("✅ Tabela de preços atualizada!");
+        }
+
+        function renderizarBotoesVenda() {
+            var grid = document.getElementById('grid-produtos');
+            grid.innerHTML = '';
+
+            produtos.forEach(function(p) {
+                var btn = document.createElement('button');
+                btn.className = 'btn-produto';
+                btn.style.backgroundColor = p.cor || '#2c3e50';
+                btn.onclick = function() { abrirSelecaoTamanho(p.id); };
+
+                btn.innerHTML = '<span class="nome">' + p.nome + '</span>' +
+                                '<span class="preco">A partir de R$ 20,00</span>' +
+                                '<span class="sub-info">' + p.sub + '</span>';
+                grid.appendChild(btn);
+            });
+        }
+
+        function abrirSelecaoTamanho(idProduto) {
+            var prod = null;
+            for (var i = 0; i < produtos.length; i++) {
+                if (produtos[i].id == idProduto) { prod = produtos[i]; break; }
+            }
+            if (!prod) return;
+
+            document.getElementById('modal-nome-produto').innerText = prod.nome;
+            var container = document.getElementById('container-tamanhos');
+            container.innerHTML = '';
+
+            prod.opcoes.forEach(function(opt) {
+                var btn = document.createElement('button');
+                btn.className = 'btn-tamanho';
+                var tagEnc = opt.encomenda ? " 📦" : "";
+                btn.innerHTML = opt.tamanho + tagEnc + '<span class="vlr">R$ ' + opt.preco.toFixed(2).replace('.', ',') + '</span>';
+                
+                btn.onclick = function() {
+                    adicionarAoCarrinho(prod, opt);
+                    fecharModalTamanho();
+                };
+                container.appendChild(btn);
+            });
+
+            document.getElementById('modal-tamanho').style.display = 'flex';
+        }
+
+        function fecharModalTamanho() {
+            document.getElementById('modal-tamanho').style.display = 'none';
+        }
+
+        function adicionarAoCarrinho(produto, opcao) {
+            var idItemUnico = produto.id + '_' + opcao.tamanho;
+            var itemExistente = null;
+
+            for (var i = 0; i < carrinho.length; i++) {
+                if (carrinho[i].key === idItemUnico) { itemExistente = carrinho[i]; break; }
+            }
+
+            if (itemExistente) {
+                itemExistente.qtd++;
+            } else {
+                carrinho.push({
+                    key: idItemUnico,
+                    id: produto.id,
+                    nome: produto.nome,
+                    tamanho: opcao.tamanho,
+                    preco: opcao.preco,
+                    encomenda: opcao.encomenda,
+                    qtd: 1
+                });
+            }
+
+            renderizarCarrinho();
+        }
+
+        function alterarQtdCarrinho(index, delta) {
+            var item = carrinho[index];
+            item.qtd += delta;
+            if (item.qtd <= 0) carrinho.splice(index, 1);
+            renderizarCarrinho();
+        }
+
+        function renderizarCarrinho() {
+            var lista = document.getElementById('lista-carrinho');
+            lista.innerHTML = '';
+            var total = 0;
+
+            if (carrinho.length === 0) {
+                lista.innerHTML = '<li style="color: #888; font-size: 12px; text-align: center; padding: 10px;">Nenhum item selecionado</li>';
+                document.getElementById('valor-total').innerText = 'R$ 0,00';
+                document.getElementById('btn-finalizar').disabled = true;
+                document.getElementById('btn-cancelar-pedido').disabled = true;
+                limparCamposTroco();
+                return;
+            }
+
+            carrinho.forEach(function(item, idx) {
+                var subtotal = item.preco * item.qtd;
+                total += subtotal;
+
+                var descEnc = item.encomenda ? " <span style='color:#e67e22;font-weight:bold;'>(Encomenda)</span>" : "";
+
+                var li = document.createElement('li');
+                li.className = 'item-carrinho';
+                li.innerHTML = '<div><strong>' + item.nome + ' - ' + item.tamanho + '</strong>' + descEnc + '<br><small>R$ ' + item.preco.toFixed(2).replace('.', ',') + ' cada</small></div>' +
+                               '<div class="qtd-controles">' +
+                               '<button class="btn-qtd" onclick="alterarQtdCarrinho(' + idx + ', -1)">-</button>' +
+                               '<span>' + item.qtd + '</span>' +
+                               '<button class="btn-qtd" onclick="alterarQtdCarrinho(' + idx + ', 1)">+</button>' +
+                               '</div>';
+                lista.appendChild(li);
+            });
+
+            document.getElementById('valor-total').innerText = 'R$ ' + total.toFixed(2).replace('.', ',');
+            document.getElementById('btn-finalizar').disabled = false;
+            document.getElementById('btn-cancelar-pedido').disabled = false;
+            
+            calcularTroco();
+        }
+
+        function cancelarPedidoAtual() {
+            if (carrinho.length === 0) return;
+            if (confirm("Deseja cancelar o pedido atual?")) {
+                carrinho = [];
+                document.getElementById('cliente-nome').value = '';
+                document.getElementById('cliente-telefone').value = '';
+                document.getElementById('chk-sem-whats').checked = false;
+                alternarCampoTelefone(document.getElementById('chk-sem-whats'));
+                renderizarCarrinho();
+            }
+        }
+
+        function selecionarMetodo(metodo, elemento) {
+            metodoSelecionado = metodo;
+            var botoes = document.querySelectorAll('.btn-pagamento');
+            for (var i = 0; i < botoes.length; i++) { botoes[i].classList.remove('ativo'); }
+            if (elemento) elemento.classList.add('ativo');
+
+            document.getElementById('painel-troco').style.display = (metodo === 'Dinheiro' && statusSelecionado === 'Pago') ? 'block' : 'none';
+        }
+
+        function selecionarStatusInicial(status) {
+            statusSelecionado = status;
+            var btnPago = document.getElementById('btn-status-pago');
+            var btnPendente = document.getElementById('btn-status-pendente');
+
+            if (status === 'Pago') {
+                btnPago.className = 'btn-status-venda ativo-pago';
+                btnPendente.className = 'btn-status-venda';
+            } else {
+                btnPago.className = 'btn-status-venda';
+                btnPendente.className = 'btn-status-venda ativo-pendente';
+            }
+
+            document.getElementById('painel-troco').style.display = (metodoSelecionado === 'Dinheiro' && statusSelecionado === 'Pago') ? 'block' : 'none';
+        }
+
+        function calcularTroco() {
+            var total = 0;
+            for (var i = 0; i < carrinho.length; i++) { total += carrinho[i].preco * carrinho[i].qtd; }
+            var valorRecebido = parseFloat(document.getElementById('input-recebido').value) || 0;
+            var troco = valorRecebido - total;
+            var elementoTroco = document.getElementById('valor-troco');
+
+            if (troco >= 0) {
+                elementoTroco.innerText = 'R$ ' + troco.toFixed(2).replace('.', ',');
+                elementoTroco.style.color = '#2c3e50';
+            } else {
+                elementoTroco.innerText = 'Faltam R$ ' + Math.abs(troco).toFixed(2).replace('.', ',');
+                elementoTroco.style.color = '#c0392b';
+            }
+        }
+
+        function aplicarCedula(valor) {
+            var total = 0;
+            for (var i = 0; i < carrinho.length; i++) { total += carrinho[i].preco * carrinho[i].qtd; }
+            var inputRecebido = document.getElementById('input-recebido');
+            inputRecebido.value = valor === 'exato' ? (total > 0 ? total.toFixed(2) : "") : valor.toFixed(2);
+            calcularTroco();
+        }
+
+        function limparCamposTroco() {
+            document.getElementById('input-recebido').value = '';
+            document.getElementById('valor-troco').innerText = 'R$ 0,00';
+            document.getElementById('valor-troco').style.color = '#2c3e50';
+        }
+
+        function concluirVenda() {
+            if (carrinho.length === 0) return;
+
+            var nome = document.getElementById('cliente-nome').value.trim();
+            var telefone = document.getElementById('cliente-telefone').value.replace(/\D/g, '');
+            var semWhats = document.getElementById('chk-sem-whats').checked;
+
+            if (!nome) {
+                alert("⚠️ Informe o Nome do Cliente antes de finalizar.");
+                document.getElementById('cliente-nome').focus();
+                return;
+            }
+
+            if (!semWhats && telefone.length < 10) {
+                alert("⚠️ Informe um número de WhatsApp válido ou marque 'Sem WhatsApp'.");
+                document.getElementById('cliente-telefone').focus();
+                return;
+            }
+
+            var total = 0;
+            for (var i = 0; i < carrinho.length; i++) { total += carrinho[i].preco * carrinho[i].qtd; }
+
+            if (metodoSelecionado === 'Dinheiro' && statusSelecionado === 'Pago') {
+                var valorRecebido = parseFloat(document.getElementById('input-recebido').value) || 0;
+                if (valorRecebido < total && valorRecebido !== 0) {
+                    if (!confirm("⚠️ Valor recebido é menor que o total. Confirmar assim mesmo?")) return;
+                }
+            }
+
+            if (metodoSelecionado === 'Pix') {
+                abrirModalPix(total);
+            } else {
+                processarFechamentoVenda(statusSelecionado, false);
+            }
+        }
+
+        function processarFechamentoVenda(statusPagamento, abrirWhats) {
+            var total = 0;
+            for (var i = 0; i < carrinho.length; i++) { total += carrinho[i].preco * carrinho[i].qtd; }
+
+            var nomeCliente = document.getElementById('cliente-nome').value.trim();
+            var telefoneCliente = document.getElementById('cliente-telefone').value.trim();
+
+            var agora = new Date();
+            var registroVenda = {
+                id: Date.now(),
+                caixa: NOME_CAIXA,
+                cliente: nomeCliente,
+                telefone: telefoneCliente,
+                hora: agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                data: agora.toISOString().split('T')[0],
+                itens: JSON.parse(JSON.stringify(carrinho)),
+                total: total,
+                metodo: metodoSelecionado,
+                status: statusPagamento || 'Pago'
+            };
+
+            historicoVendas.unshift(registroVenda);
+            localStorage.setItem('historico_camisas_' + NOME_CAIXA, JSON.stringify(historicoVendas));
+
+            notificarAdminTelegram(registroVenda);
+            enviarBackupParaGitHub();
+
+            if (abrirWhats && telefoneCliente) {
+                enviarComprovanteWhatsApp(registroVenda);
+            }
+
+            carrinho = [];
+            document.getElementById('cliente-nome').value = '';
+            document.getElementById('cliente-telefone').value = '';
+            document.getElementById('chk-sem-whats').checked = false;
+            alternarCampoTelefone(document.getElementById('chk-sem-whats'));
+
+            renderizarCarrinho();
+            renderizarHistorico();
+        }
+
+        function enviarComprovanteWhatsApp(venda) {
+            if (!venda.telefone) return;
+            var apenasNumeros = venda.telefone.replace(/\D/g, '');
+            var resumoItens = "";
+
+            for (var i = 0; i < venda.itens.length; i++) {
+                var item = venda.itens[i];
+                var tagEnc = item.encomenda ? " [Encomenda]" : "";
+                resumoItens += "• " + item.qtd + "x " + item.nome + " (" + item.tamanho + ")" + tagEnc + "\n";
+            }
+
+            var texto = "";
+            if (venda.status === 'Pendente') {
+                texto = "Olá, *" + venda.cliente + "*! 🙏\n\n" +
+                    "Registramos o seu pedido de camisas para o *Festejo de Santa Rita de Cássia*:\n\n" +
+                    "*Resumo do Pedido:*\n" +
+                    resumoItens + "\n" +
+                    "💰 *Total a Pagar:* R$ " + venda.total.toFixed(2).replace('.', ',') + "\n" +
+                    "💳 *Forma:* " + venda.metodo + " (PENDENTE ⏳)\n\n" +
+                    "Qualquer dúvida, entre em contato conosco. Deus abençoe!";
+            } else {
+                texto = "Olá, *" + venda.cliente + "*!\n\n" +
+                    "Obrigado por apoiar o *Festejo de Santa Rita de Cássia*! 🙏\n\n" +
+                    "*Resumo da sua compra:*\n" +
+                    resumoItens + "\n" +
+                    "💰 *Total:* R$ " + venda.total.toFixed(2).replace('.', ',') + " (PAGO ✅)\n" +
+                    "💳 *Forma de Pagamento:* " + venda.metodo + "\n\n" +
+                    "Deus abençoe!";
+            }
+
+            var url = "https://wa.me/55" + apenasNumeros + "?text=" + encodeURIComponent(texto);
+            window.open(url, '_blank');
+        }
+
+        function editarVendaHistorico(idVenda) {
+            if (carrinho.length > 0) {
+                if (!confirm("⚠️ Há itens no carrinho atual. Deseja descartá-los para editar este pedido?")) {
+                    return;
+                }
+            }
+
+            var idx = -1;
+            for (var i = 0; i < historicoVendas.length; i++) {
+                if (historicoVendas[i].id === idVenda) { idx = i; break; }
+            }
+
+            if (idx === -1) return;
+
+            var venda = historicoVendas[idx];
+
+            carrinho = JSON.parse(JSON.stringify(venda.itens));
+
+            document.getElementById('cliente-nome').value = venda.cliente || '';
+            document.getElementById('cliente-telefone').value = venda.telefone || '';
+
+            if (!venda.telefone) {
+                document.getElementById('chk-sem-whats').checked = true;
+                alternarCampoTelefone(document.getElementById('chk-sem-whats'));
+            } else {
+                document.getElementById('chk-sem-whats').checked = false;
+                alternarCampoTelefone(document.getElementById('chk-sem-whats'));
+            }
+
+            metodoSelecionado = venda.metodo || 'Dinheiro';
+            selecionarMetodo(metodoSelecionado, document.getElementById(metodoSelecionado === 'Pix' ? 'btn-metodo-pix' : 'btn-metodo-dinheiro'));
+
+            statusSelecionado = venda.status || 'Pendente';
+            selecionarStatusInicial(statusSelecionado);
+
+            historicoVendas.splice(idx, 1);
+            localStorage.setItem('historico_camisas_' + NOME_CAIXA, JSON.stringify(historicoVendas));
+
+            renderizarCarrinho();
+            renderizarHistorico();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function gerarRelatorioPDF() {
+            if (historicoVendas.length === 0) {
+                alert("Não há vendas registradas para gerar o relatório.");
+                return;
+            }
+
+            var janelaImpressao = window.open('', '_blank');
+            var dataHoje = new Date().toLocaleDateString('pt-BR');
+            var totalGeral = 0;
+            var totalDinheiro = 0;
+            var totalPix = 0;
+            var totalPendente = 0;
+
+            var linhasTabela = '';
+            for (var k = 0; k < historicoVendas.length; k++) {
+                var v = historicoVendas[k];
+                if (v.status === 'Pago' || !v.status) {
+                    totalGeral += v.total;
+                    if (v.metodo === 'Dinheiro') totalDinheiro += v.total;
+                    if (v.metodo === 'Pix') totalPix += v.total;
+                } else {
+                    totalPendente += v.total;
+                }
+
+                var resumoItens = '';
+                for (var m = 0; m < v.itens.length; m++) {
+                    if (m > 0) resumoItens += ', ';
+                    var tagEnc = v.itens[m].encomenda ? " [Encomenda]" : "";
+                    resumoItens += v.itens[m].qtd + 'x ' + v.itens[m].nome + ' (' + v.itens[m].tamanho + ')' + tagEnc;
+                }
+
+                var nomeCliente = v.cliente ? v.cliente : 'Não informado';
+                var telCliente = v.telefone ? v.telefone : '-';
+                var telApenasNumeros = v.telefone ? v.telefone.replace(/\D/g, '') : '';
+                
+                var linkWhats = telApenasNumeros 
+                    ? '<a href="https://wa.me/55' + telApenasNumeros + '" target="_blank" style="color:#27ae60; text-decoration:none; font-weight:bold;">📲 ' + telCliente + '</a>' 
+                    : '<span style="color:#888;">' + telCliente + '</span>';
+
+                var infoCliente = '<strong>' + nomeCliente + '</strong><br><small>' + linkWhats + '</small>';
+                var stBadge = (v.status === 'Pendente') ? ' <span style="color:#d35400;font-weight:bold;">[PENDENTE]</span>' : ' <span style="color:#27ae60;font-weight:bold;">[PAGO]</span>';
+
+                linhasTabela += '<tr>' +
+                    '<td>' + v.hora + '</td>' +
+                    '<td>' + infoCliente + '</td>' +
+                    '<td>' + resumoItens + '</td>' +
+                    '<td>' + v.metodo + stBadge + '</td>' +
+                    '<td>R$ ' + v.total.toFixed(2).replace('.', ',') + '</td>' +
+                '</tr>';
+            }
+
+            var conteudo = '<!DOCTYPE html><html><head><title>Relatório Camisas - ' + NOME_CAIXA + '</title>' +
+                '<style>' +
+                'body { font-family: Arial, sans-serif; padding: 20px; color: #333; }' +
+                'h2 { color: #2c3e50; margin-bottom: 5px; }' +
+                '.info { font-size: 13px; color: #666; margin-bottom: 15px; }' +
+                'table { width: 100%; border-collapse: collapse; margin-top: 10px; }' +
+                'th, td { border: 1px solid #ddd; padding: 8px; font-size: 12px; text-align: left; vertical-align: top; }' +
+                'th { background-color: #f4f6f9; color: #2c3e50; }' +
+                '.resumo-box { margin-top: 20px; padding: 12px; background: #e8f8f5; border: 1px solid #27ae60; border-radius: 6px; font-size: 14px; }' +
+                '.resumo-box div { margin-bottom: 4px; }' +
+                '</style></head><body>' +
+                '<h2>👕 Vendas de Camisas - Festejo de Santa Rita</h2>' +
+                '<div class="info"><strong>Caixa:</strong> ' + NOME_CAIXA.replace(/_/g, " ") + ' | <strong>Data:</strong> ' + dataHoje + '</div>' +
+                '<table><thead><tr><th>Hora</th><th>Cliente / WhatsApp (Link Clicável)</th><th>Itens & Tamanhos</th><th>Pgto</th><th>Total</th></tr></thead>' +
+                '<tbody>' + linhasTabela + '</tbody></table>' +
+                '<div class="resumo-box">' +
+                '<div>💵 <strong>Total Dinheiro (Recebido):</strong> R$ ' + totalDinheiro.toFixed(2).replace('.', ',') + '</div>' +
+                '<div>📱 <strong>Total Pix (Recebido):</strong> R$ ' + totalPix.toFixed(2).replace('.', ',') + '</div>' +
+                '<div>⏳ <strong>Total Pendente:</strong> R$ ' + totalPendente.toFixed(2).replace('.', ',') + '</div>' +
+                '<div style="font-size: 16px; font-weight: bold; margin-top: 6px; color: #27ae60;">💰 TOTAL RECEBIDO EM CAIXA: R$ ' + totalGeral.toFixed(2).replace('.', ',') + '</div>' +
+                '</div></body></html>';
+
+            janelaImpressao.document.write(conteudo);
+            janelaImpressao.document.close();
+
+            setTimeout(function() {
+                janelaImpressao.focus();
+                janelaImpressao.print();
+            }, 500);
+        }
+
+        function enviarBackupParaGitHub() {
+            if (!GITHUB_TOKEN || GITHUB_TOKEN === "SEU_GITHUB_TOKEN_AQUI") return;
+
+            var dataHoje = new Date().toISOString().split('T')[0];
+            var caminhoArquivo = "backups_camisas/vendas_" + dataHoje + "_" + NOME_CAIXA + ".csv";
+            var url = "https://api.github.com/repos/" + GITHUB_USER + "/" + GITHUB_REPO + "/contents/" + caminhoArquivo;
+
+            var conteudoCSV = "ID;Data;Hora;Caixa;Cliente;Telefone;Modelo;Tamanho;Encomenda;Qtd;PrecoUnitario;TotalItem;MetodoPagamento;Status\n";
+            for (var i = 0; i < historicoVendas.length; i++) {
+                var v = historicoVendas[i];
+                var cli = v.cliente ? v.cliente.replace(/;/g, ' ') : '';
+                var tel = v.telefone ? v.telefone : '';
+                var st = v.status || 'Pago';
+                for (var j = 0; j < v.itens.length; j++) {
+                    var item = v.itens[j];
+                    var enc = item.encomenda ? "Sim" : "Nao";
+                    conteudoCSV += v.id + ";" + v.data + ";" + v.hora + ";" + v.caixa + ";" + cli + ";" + tel + ";" + item.nome + ";" + item.tamanho + ";" + enc + ";" + item.qtd + ";" + item.preco.toFixed(2) + ";" + (item.qtd * item.preco).toFixed(2) + ";" + v.metodo + ";" + st + "\n";
+                }
+            }
+
+            var conteudoBase64 = btoa(unescape(encodeURIComponent(conteudoCSV)));
+
+            var xhrGet = new XMLHttpRequest();
+            xhrGet.open('GET', url, true);
+            xhrGet.setRequestHeader('Authorization', 'token ' + GITHUB_TOKEN);
+            xhrGet.onreadystatechange = function() {
+                if (xhrGet.readyState === 4) {
+                    var sha = null;
+                    if (xhrGet.status === 200) {
+                        try {
+                            var resp = JSON.parse(xhrGet.responseText);
+                            sha = resp.sha || null;
+                        } catch(e){}
+                    }
+
+                    var bodyData = {
+                        message: "Backup Camisas " + NOME_CAIXA + " - " + new Date().toLocaleTimeString(),
+                        content: conteudoBase64
+                    };
+                    if (sha) bodyData.sha = sha;
+
+                    var xhrPut = new XMLHttpRequest();
+                    xhrPut.open('PUT', url, true);
+                    xhrPut.setRequestHeader('Authorization', 'token ' + GITHUB_TOKEN);
+                    xhrPut.setRequestHeader('Content-Type', 'application/json');
+                    xhrPut.send(JSON.stringify(bodyData));
+                }
+            };
+            xhrGet.send();
+        }
+
+        function notificarAdminTelegram(venda) {
+            if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return;
+            var resumoItens = '';
+            for (var i = 0; i < venda.itens.length; i++) {
+                var item = venda.itens[i];
+                var descEnc = item.encomenda ? " 📦 *[ENCOMENDA]*" : "";
+                resumoItens += '• ' + item.qtd + 'x ' + item.nome + ' (' + item.tamanho + ')' + descEnc + '\n';
+            }
+            var texto = "👕 *NOVA VENDA DE CAMISA - " + NOME_CAIXA.toUpperCase().replace(/_/g, " ") + "*\n\n" +
+                        "👤 *Cliente:* " + (venda.cliente || 'Não informado') + "\n" +
+                        "📱 *Tel:* " + (venda.telefone || '-') + "\n" +
+                        "📌 *Status:* " + (venda.status === 'Pendente' ? '⏳ PENDENTE' : '✅ PAGO') + "\n\n" +
+                        resumoItens + "\n" +
+                        "💰 *Total:* R$ " + venda.total.toFixed(2).replace('.', ',') + "\n" +
+                        "💳 *Forma:* " + venda.metodo + "\n" +
+                        "🕒 *Hora:* " + venda.hora;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: texto, parse_mode: 'Markdown' }));
+        }
+
+        function renderizarHistorico() {
+            var corpo = document.getElementById('corpo-historico');
+            corpo.innerHTML = '';
+            var totalGeral = 0;
+            var totalPendente = 0;
+
+            historicoVendas.forEach(function(v) {
+                if (v.status === 'Pago' || !v.status) {
+                    totalGeral += v.total;
+                } else {
+                    totalPendente += v.total;
+                }
+
+                var resumo = v.itens.map(function(i) {
+                    var tagEnc = i.encomenda ? " [Enc.]" : "";
+                    return i.qtd + 'x ' + i.tamanho + tagEnc;
+                }).join(', ');
+
+                var nomeCliente = v.cliente ? v.cliente : 'Sem nome';
+                var statusAtual = v.status || 'Pago';
+                
+                var badgeStatus = statusAtual === 'Pago' 
+                    ? '<button onclick="alternarStatusPagamento(' + v.id + ')" style="background:#e8f8f5; color:#27ae60; border:1px solid #27ae60; border-radius:12px; padding:2px 6px; font-size:10px; font-weight:bold; cursor:pointer;">🟢 PAGO</button>'
+                    : '<button onclick="alternarStatusPagamento(' + v.id + ')" style="background:#fef9e7; color:#d35400; border:1px solid #f39c12; border-radius:12px; padding:2px 6px; font-size:10px; font-weight:bold; cursor:pointer;">🟠 PENDENTE</button>';
+
+                var badgeMetodo = '<button onclick="alternarMetodoPagamento(' + v.id + ')" style="background:#f4f6f9; color:#2c3e50; border:1px solid #bdc3c7; border-radius:12px; padding:2px 6px; font-size:10px; font-weight:bold; cursor:pointer;">' + (v.metodo === 'Pix' ? '📱 Pix' : '💵 Dinheiro') + '</button>';
+
+                var acoesHtml = '<div class="acoes-tabela">' +
+                    '<button class="btn-acao-tabela" onclick="editarVendaHistorico(' + v.id + ')" title="Editar Pedido">✏️</button>' +
+                    '<button class="btn-acao-tabela" onclick="enviarMensagemWhatsAppHistorico(' + v.id + ')" title="Enviar WhatsApp">📲</button>' +
+                    '<button class="btn-acao-tabela btn-del" onclick="cancelarVenda(' + v.id + ')" title="Cancelar Venda">❌</button>' +
+                '</div>';
+
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td>' + v.hora + '</td>' +
+                               '<td><strong>' + nomeCliente + '</strong><br>' + badgeStatus + '</td>' +
+                               '<td>' + resumo + '</td>' +
+                               '<td>' + badgeMetodo + '</td>' +
+                               '<td>R$ ' + v.total.toFixed(2).replace('.', ',') + '</td>' +
+                               '<td>' + acoesHtml + '</td>';
+                corpo.appendChild(tr);
+            });
+
+            var textoResumo = 'Recebido: R$ ' + totalGeral.toFixed(2).replace('.', ',');
+            if (totalPendente > 0) {
+                textoResumo += ' | Pendente: R$ ' + totalPendente.toFixed(2).replace('.', ',');
+            }
+            document.getElementById('resumo-faturamento').innerText = textoResumo;
+        }
+
+        function alternarStatusPagamento(idVenda) {
+            for (var i = 0; i < historicoVendas.length; i++) {
+                if (historicoVendas[i].id === idVenda) {
+                    historicoVendas[i].status = (historicoVendas[i].status === 'Pendente') ? 'Pago' : 'Pendente';
+                    break;
+                }
+            }
+            localStorage.setItem('historico_camisas_' + NOME_CAIXA, JSON.stringify(historicoVendas));
+            renderizarHistorico();
+            enviarBackupParaGitHub();
+        }
+
+        function alternarMetodoPagamento(idVenda) {
+            for (var i = 0; i < historicoVendas.length; i++) {
+                if (historicoVendas[i].id === idVenda) {
+                    historicoVendas[i].metodo = (historicoVendas[i].metodo === 'Pix') ? 'Dinheiro' : 'Pix';
+                    break;
+                }
+            }
+            localStorage.setItem('historico_camisas_' + NOME_CAIXA, JSON.stringify(historicoVendas));
+            renderizarHistorico();
+            enviarBackupParaGitHub();
+        }
+
+        function enviarMensagemWhatsAppHistorico(idVenda) {
+            var venda = null;
+            for (var i = 0; i < historicoVendas.length; i++) {
+                if (historicoVendas[i].id === idVenda) { venda = historicoVendas[i]; break; }
+            }
+            if (!venda || !venda.telefone) {
+                alert("Número de telefone não encontrado para esta venda.");
+                return;
+            }
+
+            var apenasNumeros = venda.telefone.replace(/\D/g, '');
+            var resumoItens = "";
+
+            for (var j = 0; j < venda.itens.length; j++) {
+                var item = venda.itens[j];
+                var tagEnc = item.encomenda ? " [Encomenda]" : "";
+                resumoItens += "• " + item.qtd + "x " + item.nome + " (" + item.tamanho + ")" + tagEnc + "\n";
+            }
+
+            var texto = "";
+            if (venda.status === 'Pendente') {
+                texto = "Olá, *" + venda.cliente + "*! 🙏\n\n" +
+                    "Passando para confirmar o seu pedido de camisas do *Festejo de Santa Rita de Cássia*:\n\n" +
+                    "*Itens reservados:*\n" +
+                    resumoItens + "\n" +
+                    "💰 *Valor a pagar:* R$ " + venda.total.toFixed(2).replace('.', ',') + "\n" +
+                    "📱 *Chave Pix para pagamento:* " + CHAVE_PIX + "\n\n" +
+                    "Assim que realizar o Pix ou quando vier retirar sua camisa no festejo, nos avise! Deus abençoe!";
+            } else {
+                texto = "Olá, *" + venda.cliente + "*!\n\n" +
+                    "Segue o comprovante do seu pedido para o *Festejo de Santa Rita de Cássia*: 🙏\n\n" +
+                    "*Resumo da compra:*\n" +
+                    resumoItens + "\n" +
+                    "💰 *Total:* R$ " + venda.total.toFixed(2).replace('.', ',') + " (PAGO ✅)\n" +
+                    "💳 *Forma de Pagamento:* " + venda.metodo + "\n\n" +
+                    "Obrigado pelo apoio e que Santa Rita lhe abençoe!";
+            }
+
+            var url = "https://wa.me/55" + apenasNumeros + "?text=" + encodeURIComponent(texto);
+            window.open(url, '_blank');
+        }
+
+        function cancelarVenda(idVenda) {
+            if (confirm("Deseja cancelar esta venda?")) {
+                var idx = -1;
+                for (var i = 0; i < historicoVendas.length; i++) {
+                    if (historicoVendas[i].id === idVenda) { idx = i; break; }
+                }
+                if (idx !== -1) {
+                    historicoVendas.splice(idx, 1);
+                    localStorage.setItem('historico_camisas_' + NOME_CAIXA, JSON.stringify(historicoVendas));
+                    renderizarHistorico();
+                    enviarBackupParaGitHub();
+                }
+            }
+        }
+
+        function alternarVisibilidade(idElemento) {
+            var el = document.getElementById(idElemento);
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function alterarNomeCaixa() {
+            var novoNome = prompt("Novo nome para este caixa de camisas:", NOME_CAIXA);
+            if (novoNome) {
+                NOME_CAIXA = novoNome.replace(/[^a-zA-Z0-9_-]/g, "_");
+                localStorage.setItem('nome_caixa_camisas', NOME_CAIXA);
+                location.reload();
+            }
+        }
+
+        function limparHistoricoDia() {
+            if (confirm("⚠️ Deseja ZERAR o histórico de vendas deste caixa?")) {
+                historicoVendas = [];
+                localStorage.removeItem('historico_camisas_' + NOME_CAIXA);
+                renderizarHistorico();
+                alert("Histórico zerado.");
+            }
+        }
+    </script>
+</body>
+</html>
