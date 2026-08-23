@@ -71,21 +71,7 @@
         /* DADOS CLIENTE */
         .box-cliente { background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
         .box-cliente label { font-size: 11px; text-transform: uppercase; color: #2c3e50; font-weight: bold; display: block; margin-bottom: 4px; }
-        .box-cliente input[type="text"], .box-cliente input[type="tel"] { width: 100%; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; outline: none; }
-        
-        /* ESTILO DO CHECKBOX SEM WHATSAPP */
-        .label-sem-whats {
-            font-size: 11px !important;
-            font-weight: bold;
-            color: #7f8c8d;
-            display: flex !important;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            text-transform: none !important;
-        }
-        .label-sem-whats input[type="checkbox"] { width: auto !important; cursor: pointer; }
-        input:disabled { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border-color: #ced4da; }
+        .box-cliente input { width: 100%; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; outline: none; }
 
         /* TROCO */
         .painel-troco { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
@@ -106,26 +92,9 @@
         .titulo-secao { font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
 
         .tabela-historico { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .tabela-historico th, .tabela-historico td { border-bottom: 1px solid #eee; padding: 6px; text-align: left; vertical-align: middle; }
+        .tabela-historico th, .tabela-historico td { border-bottom: 1px solid #eee; padding: 6px; text-align: left; vertical-align: top; }
 
         .btn-acao { width: 100%; background: #2c3e50; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 8px; }
-
-        /* BOTÕES DE AÇÃO AMPLIADOS NA TABELA DE HISTÓRICO */
-        .acoes-tabela { display: flex; align-items: center; gap: 8px; }
-        .btn-acao-tabela {
-            background: #f0f2f5;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            padding: 6px 8px;
-            font-size: 16px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-        }
-        .btn-acao-tabela:active { background: #e2e8f0; transform: scale(0.92); }
-        .btn-acao-tabela.btn-del { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
 
         /* MODAL SELEÇÃO DE TAMANHO */
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1500; padding: 15px; }
@@ -199,16 +168,11 @@
         <div class="box-cliente">
             <div style="margin-bottom: 8px;">
                 <label>👤 Nome do Cliente *</label>
-                <input type="text" id="cliente-nome" placeholder="Ex: Maria da Silva" autocomplete="off">
+                <input type="text" id="cliente-nome" placeholder="Ex: Maria da Silva">
             </div>
             <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                    <label style="margin-bottom: 0;">📱 WhatsApp do Cliente *</label>
-                    <label class="label-sem-whats">
-                        <input type="checkbox" id="chk-sem-whats" onchange="alternarCampoTelefone(this)"> Sem WhatsApp / Pago na Hora
-                    </label>
-                </div>
-                <input type="tel" id="cliente-telefone" placeholder="(99) 90000-0000" maxlength="15" oninput="aplicarMascaraTelefone(this)" autocomplete="off">
+                <label>📱 WhatsApp do Cliente *</label>
+                <input type="tel" id="cliente-telefone" placeholder="(99) 90000-0000" maxlength="15" oninput="aplicarMascaraTelefone(this)">
             </div>
         </div>
 
@@ -301,18 +265,19 @@
 
     <script>
         /* --- CONFIGURAÇÕES DO SISTEMA --- */
-        var TELEGRAM_BOT_TOKEN = "token";
+        var TELEGRAM_BOT_TOKEN = "8895764927:AAHxt9qSovQaBwLfkyN4w5xRxlOm9i_55aA";
         var TELEGRAM_CHAT_ID   = "158853709";
 
-        var GITHUB_TOKEN       = "github_pat_"; 
+        var GITHUB_TOKEN       = "github_pat_1"; 
         var GITHUB_USER        = "VITUFLIXYZ";
-        var GITHUB_REPO        = "pedidoscamisas";
+        var GITHUB_REPO        = "pedidoscamisas-cp";
 
-        /* CONFIGURAÇÕES DO PIX (SEM ACENTOS PARA GARANTIR LEITURA BANCÁRIA) */
+        /* CONFIGURAÇÕES DO PIX DADOS DA IGREJA/RECEBEDOR */
         var CHAVE_PIX        = "+5598991589389"; 
-        var NOME_RECEBEDOR   = "PAROQUIA SANTA RITA";
+        var NOME_RECEBEDOR   = "TAINARA";
         var CIDADE_RECEBEDOR = "SANTA RITA";
 
+        /* CONFIGURAÇÃO EXATA DE TAMANHOS E VALORES DEFINIDOS */
         var CARDAPIO_PADRAO = [
             {
                 id: "1",
@@ -357,16 +322,20 @@
         var carrinho = [];
         var historicoVendas = [];
         var metodoSelecionado = "Dinheiro";
-        var statusSelecionado = "Pago";
-        var senhaAcessoServidor = "1234";
+        var statusSelecionado = "Pago"; // 'Pago' ou 'Pendente'
+        var senhaAcessoServidor = "1472";
 
+        /* AUXILIAR DE PREENCHIMENTO DE ESPAÇOS/ZEROS */
         function padLeft(str, length, padChar) {
             padChar = padChar || '0';
             str = str.toString();
-            while (str.length < length) { str = padChar + str; }
+            while (str.length < length) {
+                str = padChar + str;
+            }
             return str;
         }
 
+        /* GERADOR DE PAYLOAD OFICIAL PIX (EMV BR CODE) */
         function calcularCRC16(str) {
             var crc = 0xFFFF;
             for (var i = 0; i < str.length; i++) {
@@ -388,9 +357,6 @@
                 return id + len + val;
             }
 
-            var nomeLimpo = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-            var cidadeLimpa = cidade.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-
             var merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
             var payloadSemCRC = '000201' +
                 formatField('26', merchantAccount) +
@@ -398,15 +364,15 @@
                 '5303986' +
                 formatField('54', valor.toFixed(2)) +
                 '5802BR' +
-                formatField('59', nomeLimpo.substring(0, 25)) +
-                formatField('60', cidadeLimpa.substring(0, 15)) +
+                formatField('59', nome.substring(0, 25)) +
+                formatField('60', cidade.substring(0, 15)) +
                 '62070503***' +
                 '6304';
 
             return payloadSemCRC + calcularCRC16(payloadSemCRC);
         }
 
-        /* --- GERENCIAMENTO DO MODAL PIX --- */
+        /* --- GERENCIAMENTO DO MODAL PIX (CORRIGIDO E UNIFICADO) --- */
         function abrirModalPix(total) {
             document.getElementById('pix-valor-display').innerText = 'R$ ' + total.toFixed(2).replace('.', ',');
             var qrContainer = document.getElementById('qrcode');
@@ -460,11 +426,14 @@
             processarFechamentoVenda(statusSelecionado, false);
         }
 
+        /* --- AUXILIARES --- */
         function ajaxGet(url, callback) {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url + '?v=' + new Date().getTime(), true);
             xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) { callback(xhr.status === 200 ? xhr.responseText : null); }
+                if (xhr.readyState === 4) {
+                    callback(xhr.status === 200 ? xhr.responseText : null);
+                }
             };
             xhr.onerror = function() { callback(null); };
             xhr.send();
@@ -474,22 +443,16 @@
             var v = input.value.replace(/\D/g, '');
             if (v.length > 11) v = v.slice(0, 11);
 
-            if (v.length === 0) { input.value = ''; }
-            else if (v.length <= 2) { input.value = '(' + v; }
-            else if (v.length <= 7) { input.value = '(' + v.slice(0, 2) + ') ' + v.slice(2); }
-            else if (v.length <= 10) { input.value = '(' + v.slice(0, 2) + ') ' + v.slice(2, 6) + '-' + v.slice(6); }
-            else { input.value = '(' + v.slice(0, 2) + ') ' + v.slice(2, 7) + '-' + v.slice(7); }
-        }
-
-        function alternarCampoTelefone(checkbox) {
-            var inputTelefone = document.getElementById('cliente-telefone');
-            if (checkbox.checked) {
-                inputTelefone.value = '';
-                inputTelefone.disabled = true;
-                inputTelefone.placeholder = "Não informado (Pago na Hora)";
+            if (v.length === 0) {
+                input.value = '';
+            } else if (v.length <= 2) {
+                input.value = '(' + v;
+            } else if (v.length <= 7) {
+                input.value = '(' + v.slice(0, 2) + ') ' + v.slice(2);
+            } else if (v.length <= 10) {
+                input.value = '(' + v.slice(0, 2) + ') ' + v.slice(2, 6) + '-' + v.slice(6);
             } else {
-                inputTelefone.disabled = false;
-                inputTelefone.placeholder = "(99) 90000-0000";
+                input.value = '(' + v.slice(0, 2) + ') ' + v.slice(2, 7) + '-' + v.slice(7);
             }
         }
 
@@ -668,8 +631,6 @@
                 carrinho = [];
                 document.getElementById('cliente-nome').value = '';
                 document.getElementById('cliente-telefone').value = '';
-                document.getElementById('chk-sem-whats').checked = false;
-                alternarCampoTelefone(document.getElementById('chk-sem-whats'));
                 renderizarCarrinho();
             }
         }
@@ -734,7 +695,6 @@
 
             var nome = document.getElementById('cliente-nome').value.trim();
             var telefone = document.getElementById('cliente-telefone').value.replace(/\D/g, '');
-            var semWhats = document.getElementById('chk-sem-whats').checked;
 
             if (!nome) {
                 alert("⚠️ Informe o Nome do Cliente antes de finalizar.");
@@ -742,8 +702,8 @@
                 return;
             }
 
-            if (!semWhats && telefone.length < 10) {
-                alert("⚠️ Informe um número de WhatsApp válido ou marque 'Sem WhatsApp'.");
+            if (telefone.length < 10) {
+                alert("⚠️ Informe um número de WhatsApp válido com DDD.");
                 document.getElementById('cliente-telefone').focus();
                 return;
             }
@@ -792,22 +752,18 @@
             notificarAdminTelegram(registroVenda);
             enviarBackupParaGitHub();
 
-            if (abrirWhats && telefoneCliente) {
+            if (abrirWhats) {
                 enviarComprovanteWhatsApp(registroVenda);
             }
 
             carrinho = [];
             document.getElementById('cliente-nome').value = '';
             document.getElementById('cliente-telefone').value = '';
-            document.getElementById('chk-sem-whats').checked = false;
-            alternarCampoTelefone(document.getElementById('chk-sem-whats'));
-
             renderizarCarrinho();
             renderizarHistorico();
         }
 
         function enviarComprovanteWhatsApp(venda) {
-            if (!venda.telefone) return;
             var apenasNumeros = venda.telefone.replace(/\D/g, '');
             var resumoItens = "";
 
@@ -860,14 +816,6 @@
 
             document.getElementById('cliente-nome').value = venda.cliente || '';
             document.getElementById('cliente-telefone').value = venda.telefone || '';
-
-            if (!venda.telefone) {
-                document.getElementById('chk-sem-whats').checked = true;
-                alternarCampoTelefone(document.getElementById('chk-sem-whats'));
-            } else {
-                document.getElementById('chk-sem-whats').checked = false;
-                alternarCampoTelefone(document.getElementById('chk-sem-whats'));
-            }
 
             metodoSelecionado = venda.metodo || 'Dinheiro';
             selecionarMetodo(metodoSelecionado, document.getElementById(metodoSelecionado === 'Pix' ? 'btn-metodo-pix' : 'btn-metodo-dinheiro'));
@@ -1067,11 +1015,8 @@
 
                 var badgeMetodo = '<button onclick="alternarMetodoPagamento(' + v.id + ')" style="background:#f4f6f9; color:#2c3e50; border:1px solid #bdc3c7; border-radius:12px; padding:2px 6px; font-size:10px; font-weight:bold; cursor:pointer;">' + (v.metodo === 'Pix' ? '📱 Pix' : '💵 Dinheiro') + '</button>';
 
-                var acoesHtml = '<div class="acoes-tabela">' +
-                    '<button class="btn-acao-tabela" onclick="editarVendaHistorico(' + v.id + ')" title="Editar Pedido">✏️</button>' +
-                    '<button class="btn-acao-tabela" onclick="enviarMensagemWhatsAppHistorico(' + v.id + ')" title="Enviar WhatsApp">📲</button>' +
-                    '<button class="btn-acao-tabela btn-del" onclick="cancelarVenda(' + v.id + ')" title="Cancelar Venda">❌</button>' +
-                '</div>';
+                var btnEditar = '<button onclick="editarVendaHistorico(' + v.id + ')" title="Editar Pedido" style="background:none; border:none; font-size:15px; cursor:pointer; margin-right:4px;">✏️</button>';
+                var btnWhats = '<button onclick="enviarMensagemWhatsAppHistorico(' + v.id + ')" title="Enviar WhatsApp" style="background:none; border:none; font-size:15px; cursor:pointer; margin-right:4px;">📲</button>';
 
                 var tr = document.createElement('tr');
                 tr.innerHTML = '<td>' + v.hora + '</td>' +
@@ -1079,7 +1024,7 @@
                                '<td>' + resumo + '</td>' +
                                '<td>' + badgeMetodo + '</td>' +
                                '<td>R$ ' + v.total.toFixed(2).replace('.', ',') + '</td>' +
-                               '<td>' + acoesHtml + '</td>';
+                               '<td>' + btnEditar + btnWhats + '<button onclick="cancelarVenda(' + v.id + ')" style="color:red;border:none;background:none;cursor:pointer;font-size:14px;">❌</button></td>';
                 corpo.appendChild(tr);
             });
 
