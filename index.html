@@ -171,7 +171,12 @@
                 <input type="text" id="cliente-nome" placeholder="Ex: Maria da Silva">
             </div>
             <div>
-                <label>📱 WhatsApp do Cliente *</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label style="margin-bottom: 0;">📱 WhatsApp do Cliente *</label>
+                    <label class="label-sem-whats">
+                        <input type="checkbox" id="chk-sem-whats" onchange="alternarCampoTelefone(this)"> Sem WhatsApp / Pago na Hora
+                    </label>
+                </div>
                 <input type="tel" id="cliente-telefone" placeholder="(99) 90000-0000" maxlength="15" oninput="aplicarMascaraTelefone(this)">
             </div>
         </div>
