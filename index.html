@@ -73,6 +73,20 @@
         .box-cliente label { font-size: 11px; text-transform: uppercase; color: #2c3e50; font-weight: bold; display: block; margin-bottom: 4px; }
         .box-cliente input { width: 100%; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; outline: none; }
 
+        /* ESTILO DO CHECKBOX SEM WHATSAPP */
+        .label-sem-whats {
+            font-size: 11px !important;
+            font-weight: bold;
+            color: #7f8c8d;
+            display: flex !important;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            text-transform: none !important;
+        }
+        .label-sem-whats input[type="checkbox"] { width: auto !important; cursor: pointer; }
+        input:disabled { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border-color: #ced4da; }
+        
         /* TROCO */
         .painel-troco { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
         .campo-recebido { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 14px; font-weight: bold; }
@@ -168,11 +182,16 @@
         <div class="box-cliente">
             <div style="margin-bottom: 8px;">
                 <label>👤 Nome do Cliente *</label>
-                <input type="text" id="cliente-nome" placeholder="Ex: Maria da Silva">
+                <input type="text" id="cliente-nome" placeholder="Ex: Maria da Silva" autocomplete="off">
             </div>
             <div>
-                <label>📱 WhatsApp do Cliente *</label>
-                <input type="tel" id="cliente-telefone" placeholder="(99) 90000-0000" maxlength="15" oninput="aplicarMascaraTelefone(this)">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label style="margin-bottom: 0;">📱 WhatsApp do Cliente *</label>
+                    <label class="label-sem-whats">
+                        <input type="checkbox" id="chk-sem-whats" onchange="alternarCampoTelefone(this)"> Sem WhatsApp / Pago na Hora
+                    </label>
+                </div>
+                <input type="tel" id="cliente-telefone" placeholder="(99) 90000-0000" maxlength="15" oninput="aplicarMascaraTelefone(this)" autocomplete="off">
             </div>
         </div>
 
