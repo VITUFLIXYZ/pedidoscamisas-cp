@@ -714,6 +714,7 @@
 
             var nome = document.getElementById('cliente-nome').value.trim();
             var telefone = document.getElementById('cliente-telefone').value.replace(/\D/g, '');
+            var semWhats = document.getElementById('chk-sem-whats').checked;
 
             if (!nome) {
                 alert("⚠️ Informe o Nome do Cliente antes de finalizar.");
@@ -721,8 +722,8 @@
                 return;
             }
 
-            if (telefone.length < 10) {
-                alert("⚠️ Informe um número de WhatsApp válido com DDD.");
+            if (!semWhats && telefone.length < 10) {
+                alert("⚠️ Informe um número de WhatsApp válido ou marque 'Sem WhatsApp'.");
                 document.getElementById('cliente-telefone').focus();
                 return;
             }
