@@ -281,7 +281,55 @@
             </div>
         </div>
     </div>
+/* --- GERADOR DE PIX COPIA E COLA (BR CODE) --- */
+function gerarPixCopiaECola(chave, nome, cidade, valor, txid) {
+    chave = chave.trim();
+    nome = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().substring(0, 25);
+    cidade = cidade.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().substring(0, 15);
+    txid = (txid || '***').substring(0, 25);
+    var valorStr = parseFloat(valor).toFixed(2);
 
+    function formatField(id, value) {
+        var len = value.length.toString().padStart(2, '0');
+        return id + len + value;
+    }
+
+    // Estrutura do payload PIX
+    var payload = "000201"; // Payload Format Indicator
+    
+    // Merchant Account Information - PIX
+    var merchantAccount = formatField("00", "br.gov.bcb.pix") + formatField("01", chave);
+    payload += formatField("26", merchantAccount);
+    
+    payload += "52040000"; // Merchant Category Code (General)
+    payload += "5303986";  // Transaction Currency (986 = BRL)
+    payload += formatField("54", valorStr); // Transaction Amount
+    payload += "5802BR";   // Country Code
+    payload += formatField("59", nome);   // Merchant Name
+    payload += formatField("60", cidade); // Merchant City
+    
+    // Additional Data Field Template (TxID)
+    var additionalData = formatField("05", txid);
+    payload += formatField("62", additionalData);
+    
+    payload += "6304"; // CRC16 Header
+
+    // Cálculo do CRC16 CCITT
+    var crc = 0xFFFF;
+    for (var i = 0; i < payload.length; i++) {
+        crc ^= (payload.charCodeAt(i) << 8);
+        for (var j = 0; j < 8; j++) {
+            if ((crc & 0x8000) !== 0) {
+                crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+            } else {
+                crc = (crc << 1) & 0xFFFF;
+            }
+        }
+    }
+    
+    var crcHex = crc.toString(16).toUpperCase().padStart(4, '0');
+    return payload + crcHex;
+}
     <script>
         /* --- CONFIGURAÇÕES DO SISTEMA --- */
         var TELEGRAM_BOT_TOKEN = "8895764927:AAHxt9qSovQaBwLfkyN4w5xRxlOm9i_55aA";
@@ -1037,6 +1085,25 @@
 
                 var btnEditar = '<button onclick="editarVendaHistorico(' + v.id + ')" title="Editar Pedido" style="background:none; border:none; font-size:15px; cursor:pointer; margin-right:4px;">✏️</button>';
                 var btnWhats = '<button onclick="enviarMensagemWhatsAppHistorico(' + v.id + ')" title="Enviar WhatsApp" style="background:none; border:none; font-size:15px; cursor:pointer; margin-right:4px;">📲</button>';
+<!-- BOTÃO PARA COPIAR O PIX COPIA E COLA -->
+<button type="button" onclick="copiarPixParaTransferencia(totalCarrinho)" style="
+    width: 100%;
+    padding: 10px;
+    background-color: #007bf5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 13px;
+    margin-top: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+">
+    📋 Copiar PIX Copia e Cola
+</button>
 
                 var tr = document.createElement('tr');
                 tr.innerHTML = '<td>' + v.hora + '</td>' +
@@ -1158,6 +1225,24 @@
                 alert("Histórico zerado.");
             }
         }
+        function copiarPixParaTransferencia(valorTotal) {
+    if (!valorTotal || valorTotal <= 0) {
+        alert("Adicione itens ao carrinho para gerar o código PIX!");
+        return;
+    }
+
+    // Utiliza as variáveis que você já possui declaradas no início do seu script
+    var codigoPix = gerarPixCopiaECola(CHAVE_PIX, NOME_RECEBEDOR, CIDADE_RECEBEDOR, valorTotal, "CAMISAS");
+
+    // Copia para o teclado/área de transferência
+    navigator.clipboard.writeText(codigoPix).then(function() {
+        alert("✅ Código PIX Copia e Cola copiado com sucesso!\n\nAgora cole no aplicativo do seu banco.");
+    }).catch(function() {
+        // Fallback para navegadores antigos/mobiles sem suporte a clipboard API
+        prompt("Copie o código PIX abaixo manualmente:", codigoPix);
+    });
+}
+
     </script>
 </body>
 </html>
